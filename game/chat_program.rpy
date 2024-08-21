@@ -193,7 +193,7 @@ init python:
 
         # pause briefly if we are swapping windows
         if last_window != active_window and not is_player:
-            renpy.call_screen("fake_chat_pause", 1)
+            chat_pause(1)
 
         # set the wait time of the current message (typing it out)
         wait_time = len(message)/5/chat_speed
@@ -219,9 +219,9 @@ init python:
                 # Otherwise, pause before sending so MC's messages don't all appear at once
                 elif chat_speed != 100:
                     if fastmode == -1:
-                        renpy.call_screen("fake_chat_pause", wait_time)
+                        chat_pause(wait_time)
                     else:
-                        renpy.call_screen("fake_chat_pause", fastmode)
+                        chat_pause(fastmode)
         else:
             if chat_speed != 100:
 
@@ -340,14 +340,14 @@ init python:
             else:
                 who_is_typing = ""
             if fastmode != -1:
-                renpy.call_screen("fake_chat_pause", wtp)
+                chat_pause(wtp)
 
         # show new list of typers
         who_is_typing = format_typers(n_list)
         if fastmode == -1:
-            renpy.call_screen("fake_chat_pause", wt)
+            chat_pause(wt)
         else:
-            renpy.call_screen("fake_chat_pause", fastmode)
+            chat_pause(fastmode)
 
         # save off who was now typing + reset
         who_was_typing_list = n_list
@@ -373,6 +373,12 @@ init python:
                 w = w + "is typing..."
         return(w)
 
+
+    def chat_pause(timer):
+        if renpy.is_skipping():
+            renpy.pause()
+        else:
+            renpy.call_screen("fake_chat_pause", timer)
 
 ##-----------------------------------------------------
 ## screen
@@ -490,3 +496,5 @@ screen fake_chat_pause(timer_length):
         dismiss action Return()
 
     use chat_messages_view()
+
+    key "skip" action Return()
